@@ -24,7 +24,7 @@ def main():
         traceback.print_exc()
         print "**************************************"
     try:
-        channel.queue_declare(queue='all_messages', exclusive=True)
+        channel.queue_declare(queue='all_messages', durable=True)
     except:
         print "Exchange already exists or some error!"
         traceback.print_exc()
