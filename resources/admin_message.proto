@@ -1,0 +1,12 @@
+package messaging.proto;
+
+message AdminControl {
+	required string authentication_key	= 1;
+}
+
+message AdminCommand {
+	required string user				= 1;
+	required string command				= 2;
+	required AdminControl control		= 3;
+	optional string options				= 4;
+}
