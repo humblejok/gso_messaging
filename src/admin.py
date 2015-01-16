@@ -6,7 +6,7 @@ def handle_message(channel, method, properties, body):
     command.ParseFromString(body)
     print properties.reply_to
     
-    channel.basic_publish(exchange='admin_exchange',
+    channel.basic_publish(exchange='',
                           routing_key=properties.reply_to,
                           properties=pika.BasicProperties(correlation_id = properties.correlation_id),
                           body='Une reponse')
