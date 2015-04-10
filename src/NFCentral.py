@@ -20,6 +20,7 @@ class Users(object):
     def remove_user(self, channel, method, properties, body):
         data = body.split('@')
         if data[0] in self.registered_users:
+            self.registered_users.remove(data[0])
             print data[0] + "-> Unregistered"
             return True
         print data[0] + "-> Already registered"

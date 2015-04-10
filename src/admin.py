@@ -9,20 +9,23 @@ def print_message(channel, method, properties, body):
     data = body.split('@')
     print data[0] + ' says:' + data[1]
     
-def listening_registering(working_queue, channel, server_status):
+def listening_registering(channel, server_status):
     print "Registering thread"
+    working_queue = channel.queue_declare(exclusive=True)
     channel.queue_bind(exchange='nfc_central', queue=working_queue.method.queue, routing_key="registering")
     channel.basic_consume(server_status.add_user, queue=working_queue.method.queue, no_ack=True)
     channel.start_consuming()
     
-def listening_unregistering(working_queue, channel, server_status):
+def listening_unregistering(channel, server_status):
     print "Unregistering thread"
+    working_queue = channel.queue_declare(exclusive=True)
     channel.queue_bind(exchange='nfc_central', queue=working_queue.method.queue, routing_key="unregistering")
     channel.basic_consume(server_status.remove_user, queue=working_queue.method.queue, no_ack=True)
     channel.start_consuming()
     
-def listening_query(working_queue, channel, server_status):
+def listening_query(channel, server_status):
     print "Query thread"
+    working_queue = channel.queue_declare(exclusive=True)
     channel.queue_bind(exchange='nfc_central', queue=working_queue.method.queue, routing_key="query")
     channel.basic_consume(print_message, queue=working_queue.method.queue, no_ack=True)
     channel.start_consuming()
@@ -36,12 +39,12 @@ def main():
         print "Exchange already exists or some error!"
         traceback.print_exc()
         print "**************************************"
-    working_queue = channel.queue_declare(exclusive=True)
-    listeners = [listening_registering, listening_unregistering, listening_query]
+    
+    listeners = [listening_registering, listening_query, listening_unregistering]
     listening_functions = []
     server_status = NFCentral.Users()
     for listener in listeners:
-        listener_function = threading.Thread(target=listener, args = (working_queue, channel, server_status))
+        listener_function = threading.Thread(target=listener, args = (channel, server_status))
         listener_function.start()
         listening_functions.append(listener_function)
         time.sleep(1)
